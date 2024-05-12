@@ -8,8 +8,9 @@ Models explored include:
 - SwinUNetR
 - UNetR
 - SegFormer
+- Mask2Former
 
-The best performing model was the classic UNet architecture with the follwing metrics:
+The best performing model was the classic UNet architecture with the following metrics:
 
 - Avg F1-score: 92.6%
 - AVG DICE Coeff.: 92.6%
