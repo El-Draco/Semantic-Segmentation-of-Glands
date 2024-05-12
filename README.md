@@ -11,6 +11,23 @@ Models explored include:
 
 The best performing model was the classic UNet architecture with the follwing metrics:
 
+- Avg F1-score: 92.6%
+- AVG DICE Coeff.: 92.6%
+- IoU: 86.2%
+- Precision: 92.3%
+- Recall: 93.1%
+- Sensitivity: 93.1%
+- Specificity: 96.2%
+
+
+
+The training vs validation loss curve is shown below:
+![Train vs Validation Loss Plot](train_val_plot.png)
+
+
+Some sample predictions and the ground truth are shown below:
+
+![Predicted vs ORiginal Samples](predictions.png)
 ## Dataset Description:
 
 Pixel Classes:
