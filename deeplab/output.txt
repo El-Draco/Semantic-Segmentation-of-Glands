@@ -1,7 +1,0 @@
-finished constructing dataset_train
-finished constructing dataset_valid
-finished constructing dataloader training
-finished constructing dataloader valid
-Batch shape: torch.Size([8, 3, 256, 256])
-device :  cuda
-input_1:torch.Size([8, 100, 3])
