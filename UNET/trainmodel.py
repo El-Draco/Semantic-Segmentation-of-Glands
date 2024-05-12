@@ -19,6 +19,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from plot import plot_training
 
 # root directory
 root = pathlib.Path.cwd()
@@ -91,10 +92,6 @@ total_samples_train = len(targets_train_flat)
 class_weights_train = [1 / (count / total_samples_train) for count in class_counts_train]
 
 
-
-# inputs_train, inputs_valid = inputs[:80], inputs[80:]
-# targets_train, targets_valid = targets[:80], targets[:80]
-
 # dataset training
 dataset_train = GlandDataset(inputs=inputs_train,
                                     targets=targets_train,
@@ -156,8 +153,6 @@ def postprocess(img: torch.tensor, threshold: float = 0.75):
     
 
 
-
-
 # model
 model = UNet(in_channels=3,
              out_channels=3,
@@ -187,87 +182,12 @@ trainer = Trainer(model=model,
                   notebook=False)
 
 
-#from lr_finder import LearningRateFinder
-
-#lrf = LearningRateFinder(model, criterion, optimizer, device)
-#lrf.fit(dataloader_training, steps=1000)
-#lrf.plot()
-
-
 # start training
 training_losses, validation_losses, lr_rates = trainer.run_trainer()
 
 # save the model
 model_name =  'unet_100_epochs_adam_actual_ftl.pt'
 torch.save(model.state_dict(), pathlib.Path.cwd() / model_name)
-
-def plot_training(training_losses,
-                  validation_losses,
-                  learning_rate,
-                  gaussian=True,
-                  sigma=2,
-                  figsize=(8, 6)
-                  ):
-    """
-    Returns a loss plot with training loss, validation loss and learning rate.
-    """
-
-    import matplotlib.pyplot as plt
-    from matplotlib import gridspec
-    from scipy.ndimage import gaussian_filter
-
-    list_len = len(training_losses)
-    x_range = list(range(1, list_len + 1))  # number of x values
-
-    fig = plt.figure(figsize=figsize)
-    grid = gridspec.GridSpec(ncols=2, nrows=1, figure=fig)
-
-    subfig1 = fig.add_subplot(grid[0, 0])
-    subfig2 = fig.add_subplot(grid[0, 1])
-
-    subfigures = fig.get_axes()
-
-    for i, subfig in enumerate(subfigures, start=1):
-        subfig.spines['top'].set_visible(False)
-        subfig.spines['right'].set_visible(False)
-
-    if gaussian:
-        training_losses_gauss = gaussian_filter(training_losses, sigma=sigma)
-        validation_losses_gauss = gaussian_filter(validation_losses, sigma=sigma)
-
-        linestyle_original = '.'
-        color_original_train = 'lightcoral'
-        color_original_valid = 'lightgreen'
-        color_smooth_train = 'red'
-        color_smooth_valid = 'green'
-        alpha = 0.25
-    else:
-        linestyle_original = '-'
-        color_original_train = 'red'
-        color_original_valid = 'green'
-        alpha = 1.0
-
-    # Subfig 1
-    subfig1.plot(x_range, training_losses, linestyle_original, color=color_original_train, label='Training',
-                 alpha=alpha)
-    subfig1.plot(x_range, validation_losses, linestyle_original, color=color_original_valid, label='Validation',
-                 alpha=alpha)
-    if gaussian:
-        subfig1.plot(x_range, training_losses_gauss, '-', color=color_smooth_train, label='Training', alpha=0.75)
-        subfig1.plot(x_range, validation_losses_gauss, '-', color=color_smooth_valid, label='Validation', alpha=0.75)
-    subfig1.title.set_text('Training & validation loss')
-    subfig1.set_xlabel('Epoch')
-    subfig1.set_ylabel('Loss')
-
-    subfig1.legend(loc='upper right')
-
-    # Subfig 2
-    subfig2.plot(x_range, learning_rate, color='black')
-    subfig2.title.set_text('Learning rate')
-    subfig2.set_xlabel('Epoch')
-    subfig2.set_ylabel('LR')
-
-    return fig
 
 fig = plot_training(training_losses, validation_losses, lr_rates, gaussian=True, sigma=1, figsize=(10, 4))
 fig.savefig('training_plot.png')
